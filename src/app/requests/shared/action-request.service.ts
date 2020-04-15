@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { flow, orderBy } from 'lodash/fp';
-import { Observable } from 'rxjs/Observable';
-import { timer } from 'rxjs/observable/timer';
-import { first, map, takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { timer } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 
 import { AngularFirestoreService } from '../../shared';
 import { ActionRequest } from './action-request.model';
@@ -14,7 +14,7 @@ export class ActionRequestService {
   private initialCounter = 1000;
   private prefix = 'AR';
 
-  constructor(private afs: AngularFirestoreService) { }
+  constructor(private afs: AngularFirestoreService) {}
 
   getActionRequest(actionRequestKey: string): Observable<ActionRequest> {
     const databasePath = `${this.actionRequestsPath}/${actionRequestKey}`;
@@ -22,47 +22,55 @@ export class ActionRequestService {
   }
 
   getActionRequests(limit = 10000): Observable<ActionRequest[]> {
-    return this.afs.collection<ActionRequest>(
-      this.actionRequestsPath, ref => ref.orderBy('createdAt', 'desc').limit(limit)
+    return this.afs.collection<ActionRequest>(this.actionRequestsPath, (ref) =>
+      ref.orderBy('createdAt', 'desc').limit(limit)
     );
   }
 
   getOpenActionRequests(limit = 10000): Observable<ActionRequest[]> {
-    return this.afs.collection<ActionRequest>(
-      this.actionRequestsPath, ref => ref.where('status', '<=', 'new').limit(limit)
-    ).pipe(
-      map((actionRequests: ActionRequest[]) => flow([orderBy('createdAt', 'desc')])(actionRequests))
-    );
+    return this.afs
+      .collection<ActionRequest>(this.actionRequestsPath, (ref) =>
+        ref.where('status', '<=', 'new').limit(limit)
+      )
+      .pipe(
+        map((actionRequests: ActionRequest[]) =>
+          flow([orderBy('createdAt', 'desc')])(actionRequests)
+        )
+      );
   }
 
   create(actionRequest: ActionRequest): Promise<ActionRequest> {
-    return this
-      ._incrementCounter(400)
+    return this._incrementCounter(400)
       .then(() => this._incrementCounter())
-      .then(counter => this.afs.add<ActionRequest>(
-        this.actionRequestsPath, {
+      .then((counter) =>
+        this.afs.add<ActionRequest>(this.actionRequestsPath, {
           ...actionRequest,
           assignee: this._formatEmailAddress(actionRequest.assignee),
           reporter: this._formatReporter(actionRequest.reporter),
           watchers: this._populateWatchers(actionRequest),
           humanReadableCode: counter
             ? this.addPrefix(counter)
-            : actionRequest.humanReadableCode
-              && this.addPrefix(this.removePrefix(actionRequest.humanReadableCode) + 1)
-              || this.addPrefix(this.initialCounter)
-        }
-      ));
+            : (actionRequest.humanReadableCode &&
+                this.addPrefix(
+                  this.removePrefix(actionRequest.humanReadableCode) + 1
+                )) ||
+              this.addPrefix(this.initialCounter),
+        })
+      );
   }
 
   set(actionRequest: ActionRequest): Promise<void> {
-    return this.afs.set(`${this.actionRequestsPath}/${actionRequest.key}`, actionRequest);
+    return this.afs.set(
+      `${this.actionRequestsPath}/${actionRequest.key}`,
+      actionRequest
+    );
   }
 
   update(actionRequest: ActionRequest): Promise<void> {
     return this.afs.update(`${this.actionRequestsPath}/${actionRequest.key}`, {
       ...actionRequest,
       assignee: this._formatEmailAddress(actionRequest.assignee),
-      reporter: this._formatReporter(actionRequest.reporter)
+      reporter: this._formatReporter(actionRequest.reporter),
     });
   }
 
@@ -95,7 +103,7 @@ export class ActionRequestService {
   }
 
   _populateWatchers(actionRequest: ActionRequest): string[] {
-    const watchers = [ this._formatEmailAddress(actionRequest.assignee) ];
+    const watchers = [this._formatEmailAddress(actionRequest.assignee)];
 
     if (!actionRequest.reporter.trim().includes(' ')) {
       watchers.push(this._formatEmailAddress(actionRequest.reporter));
@@ -106,14 +114,15 @@ export class ActionRequestService {
 
   _incrementCounter(delay = 1500): Promise<number> {
     return this.afs
-      .collection<ActionRequest>(this.actionRequestsPath, ref => ref.orderBy('humanReadableCode', 'desc').limit(1))
-      .pipe(
-        takeUntil(timer(delay))
+      .collection<ActionRequest>(this.actionRequestsPath, (ref) =>
+        ref.orderBy('humanReadableCode', 'desc').limit(1)
       )
+      .pipe(takeUntil(timer(delay)))
       .toPromise()
-      .then(actionRequests => (actionRequests && actionRequests.length)
-        ? this.removePrefix(actionRequests[0].humanReadableCode) + 1
-        : null
+      .then((actionRequests) =>
+        actionRequests && actionRequests.length
+          ? this.removePrefix(actionRequests[0].humanReadableCode) + 1
+          : null
       );
   }
 }

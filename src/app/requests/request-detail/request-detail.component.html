@@ -7,7 +7,8 @@
       </mat-icon>
     </mat-card-title>
     <mat-card-subtitle>
-      {{ request.createdAt.toDate() | date:'mediumDate' }} {{ request.createdAt.toDate() | date:'shortTime' | lowercase }}
+      {{ request.createdAt.toDate() | date:'mediumDate' }}
+      {{ request.createdAt.toDate() | date:'shortTime' | lowercase }}
     </mat-card-subtitle>
   </mat-card-title-group>
   <mat-card-content>
@@ -24,11 +25,8 @@
       </button>
     </p>
     <p>
-      <app-assignee-autocomplete
-        *ngIf="assigneeEditable"
-        [assignee]="request.assignee"
-        (onCancel)="assigneeEditable = false"
-        (onSave)="reassign($event)">
+      <app-assignee-autocomplete *ngIf="assigneeEditable" [assignee]="request.assignee"
+        (onCancel)="assigneeEditable = false" (onSave)="reassign($event)">
       </app-assignee-autocomplete>
     </p>
 
@@ -42,7 +40,7 @@
 
     <h3>Sales Order</h3>
     <p [class.less-visible]="!request.salesOrderNumber">
-      SO# {{ (request.salesOrderNumber | uppercase) || 'Unknown' }}
+      SO# {{ ((request?.salesOrderNumber?.toString()) | uppercase) || 'Unknown' }}
     </p>
 
     <h3>Category</h3>
@@ -65,7 +63,8 @@
       <span *ngFor="let attachment of request.attachments">
         <a class="attachment-link" href="{{ attachment.attachmentUrl }}" target="_blank">
           <img class="attachment" src="{{ attachment.thumbUrl }}">
-          <span class="attachment-filename" *ngIf="attachment.attachmentUrl !== attachment.thumbUrl">{{ attachment.filename }}</span>
+          <span class="attachment-filename"
+            *ngIf="attachment.attachmentUrl !== attachment.thumbUrl">{{ attachment.filename }}</span>
         </a>
       </span>
     </div>
@@ -95,7 +94,8 @@
   <mat-card-actions class="action-buttons" align="end">
     <button mat-button (click)="goBack()">BACK</button>
     <button mat-raised-button color="accent" (click)="update()">UPDATE</button>
-    <button *ngIf="request.status !== 'resolved'" mat-raised-button color="warn" (click)="closePrompt()">RESOLVE</button>
+    <button *ngIf="request.status !== 'resolved'" mat-raised-button color="warn"
+      (click)="closePrompt()">RESOLVE</button>
   </mat-card-actions>
 </mat-card>
 

@@ -7,15 +7,12 @@
     <mat-card-content>
       <div class="line" *ngIf="!request.key">
         <mat-form-field class="wide-input">
-          <input matInput
-            [formControl]="reporterControl" [matAutocomplete]="reporterAutocomplete" [(ngModel)]="request.reporter"
-            placeholder="Reporter Email"
-            type="text"
-            minlength="2"
+          <input matInput [formControl]="reporterControl" [matAutocomplete]="reporterAutocomplete"
+            [(ngModel)]="request.reporter" placeholder="Reporter Email" type="text" minlength="2"
             [pattern]="(request.reporter !== undefined && !request.reporter.includes('@')) && '[a-zA-Z ]+[a-zA-Z.]+[a-zA-Z ]*' || '.*'"
-            [email]="request.reporter !== undefined && request.reporter.includes('@')"
-            required>
-          <span matSuffix *ngIf="request.reporter === undefined || request.reporter === '' || request.reporter && !request.reporter.includes('@')">@premier-pump.net</span>
+            [email]="request.reporter !== undefined && request.reporter.includes('@')" required>
+          <span matSuffix
+            *ngIf="request.reporter === undefined || request.reporter === '' || request.reporter && !request.reporter.includes('@')">@premier-pump.net</span>
           <mat-autocomplete #reporterAutocomplete="matAutocomplete">
             <mat-option *ngFor="let option of filteredReporters | async" [value]="option">
               {{ option }}
@@ -26,15 +23,12 @@
 
       <div class="line">
         <mat-form-field class="wide-input">
-          <input matInput
-            [formControl]="assigneeControl" [matAutocomplete]="assigneeAutocomplete" [(ngModel)]="request.assignee"
-            placeholder="Assignee Email"
-            type="text"
-            minlength="2"
+          <input matInput [formControl]="assigneeControl" [matAutocomplete]="assigneeAutocomplete"
+            [(ngModel)]="request.assignee" placeholder="Assignee Email" type="text" minlength="2"
             [pattern]="(request.assignee !== undefined && !request.assignee.includes('@')) && '[ ]*[a-zA-Z.]+[ ]*' || '.*'"
-            [email]="request.assignee !== undefined && request.assignee.includes('@')"
-            required>
-          <span matSuffix *ngIf="request.assignee !== undefined && !request.assignee.includes('@')">@premier-pump.net</span>
+            [email]="request.assignee !== undefined && request.assignee.includes('@')" required>
+          <span matSuffix
+            *ngIf="request.assignee !== undefined && !request.assignee.includes('@')">@premier-pump.net</span>
           <mat-autocomplete #assigneeAutocomplete="matAutocomplete">
             <mat-option *ngFor="let option of filteredAssignees | async" [value]="option">
               {{ option }}
@@ -44,13 +38,9 @@
       </div>
 
       <div class="line">
-        <mat-input-container class="wide-input">
-          <input matInput
-                 [(ngModel)]="request.salesOrderNumber"
-                 name="salesOrderNumber"
-                 placeholder="SO#"
-                 required>
-        </mat-input-container>
+        <mat-form-field class="wide-input">
+          <input matInput [(ngModel)]="request.salesOrderNumber" name="salesOrderNumber" placeholder="SO#" required>
+        </mat-form-field>
       </div>
 
       <div class="line">
@@ -66,34 +56,21 @@
         </mat-checkbox>
       </div>
 
-      <app-watchers-chip-list-input
-        class="line"
-        *ngIf="request.key"
-        [watchers]="request.watchers"
+      <app-watchers-chip-list-input class="line" *ngIf="request.key" [watchers]="request.watchers"
         (watchersUpdated)="request.watchers = $event">
       </app-watchers-chip-list-input>
 
-      <mat-input-container class="line">
-        <textarea matInput
-               matTextareaAutosize
-               [matAutosizeMinRows]="5"
-               [(ngModel)]="request.discrepancy"
-               name="discrepancy"
-               placeholder="Discrepancy"
-               required>
+      <mat-form-field class="line">
+        <textarea matInput matTextareaAutosize [matAutosizeMinRows]="5" [(ngModel)]="request.discrepancy"
+          name="discrepancy" placeholder="Discrepancy" required>
         </textarea>
-      </mat-input-container>
+      </mat-form-field>
 
-      <mat-input-container class="line">
-        <textarea matInput
-               matTextareaAutosize
-               [matAutosizeMinRows]="5"
-               [(ngModel)]="request.suggestedRemedy"
-               name="suggestedRemedy"
-               placeholder="Suggested Remedy"
-               required>
+      <mat-form-field class="line">
+        <textarea matInput matTextareaAutosize [matAutosizeMinRows]="5" [(ngModel)]="request.suggestedRemedy"
+          name="suggestedRemedy" placeholder="Suggested Remedy" required>
         </textarea>
-      </mat-input-container>
+      </mat-form-field>
 
       <div *ngIf="currentUpload">
         <progress class="progress-bar" min=1 max=100 value="{{ currentUpload?.progress }}"></progress>
@@ -101,12 +78,17 @@
       </div>
 
       <label class="input-wrapper">
-        <file-drop class="upload-form" (onFileDrop)="droppedFiles($event)" customstyle="drop-zone-custom">
-          <span class="drop-message">
-            Click <span class="hide-on-small-screens">or drag </span>to upload <span class="hide-on-small-screens">files and </span>pictures
-          </span>
-          <input type="file" accept="{{ acceptedFileTypes.join(',') }}" class="button" (change)="processFiles($event)" multiple>
-        </file-drop>
+        <ngx-file-drop class="upload-form" (onFileDrop)="droppedFiles($event)" customstyle="drop-zone-custom">
+          <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+            <span class="drop-message">
+              Click <span class="hide-on-small-screens">or drag </span>to upload <span
+                class="hide-on-small-screens">files
+                and </span>pictures
+            </span>
+            <input type="file" accept="{{ acceptedFileTypes.join(',') }}" class="button" (change)="processFiles($event)"
+              multiple>
+          </ng-template>
+        </ngx-file-drop>
       </label>
 
       <div class="attachments-wrapper">
@@ -120,7 +102,8 @@
           <span *ngFor="let attachment of request.attachments">
             <span class="attachment-link">
               <img class="attachment" src="{{ attachment.thumbUrl }}">
-              <span class="attachment-filename" *ngIf="attachment.attachmentUrl !== attachment.thumbUrl">{{ attachment.filename }}</span>
+              <span class="attachment-filename"
+                *ngIf="attachment.attachmentUrl !== attachment.thumbUrl">{{ attachment.filename }}</span>
             </span>
           </span>
         </span>
@@ -136,45 +119,31 @@
         </mat-form-field>
       </div>
 
-      <mat-input-container class="line">
-        <textarea matInput
-               matTextareaAutosize
-               [matAutosizeMinRows]="5"
-               [(ngModel)]="request.approvedActionPlan"
-               name="approvedActionPlan"
-               placeholder="Approved Plan of Action">
+      <mat-form-field class="line">
+        <textarea matInput matTextareaAutosize [matAutosizeMinRows]="5" [(ngModel)]="request.approvedActionPlan"
+          name="approvedActionPlan" placeholder="Approved Plan of Action">
         </textarea>
-      </mat-input-container>
+      </mat-form-field>
 
       <div class="line">
-        <mat-input-container>
-          <input matInput
-                 [(ngModel)]="request.ecn"
-                 name="ecn"
-                 placeholder="ECN">
-        </mat-input-container>
+        <mat-form-field>
+          <input matInput [(ngModel)]="request.ecn" name="ecn" placeholder="ECN">
+        </mat-form-field>
       </div>
 
-      <mat-input-container class="line" *ngIf="request.status === 'resolved'">
-        <textarea matInput
-                  matTextareaAutosize
-                  [matAutosizeMinRows]="5"
-                  [(ngModel)]="request.resolution"
-                  name="resolution"
-                  placeholder="Resolution"
-                  required>
+      <mat-form-field class="line" *ngIf="request.status === 'resolved'">
+        <textarea matInput matTextareaAutosize [matAutosizeMinRows]="5" [(ngModel)]="request.resolution"
+          name="resolution" placeholder="Resolution" required>
         </textarea>
-      </mat-input-container>
+      </mat-form-field>
     </mat-card-content>
 
     <mat-card-actions align="end">
       <button *ngIf="showBackButton" mat-button type="button" (click)="goBack()">CANCEL</button>
 
-      <button mat-raised-button
-              color="accent"
-              (click)="save()"
-              [disabled]="isSaving || !requestForm.form.valid || requestForm.form.disabled || !request.assignee || !request.reporter"
-              type="button">
+      <button mat-raised-button color="accent" (click)="save()"
+        [disabled]="isSaving || !requestForm.form.valid || requestForm.form.disabled || !request.assignee || !request.reporter"
+        type="button">
         {{ showBackButton ? 'SAVE' : 'SUBMIT' }}
       </button>
     </mat-card-actions>
@@ -191,4 +160,3 @@
     {{ increment }}
   </p>
 </div>
-

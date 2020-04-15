@@ -1,9 +1,9 @@
 {
   "functions": {
-    "predeploy": "yarn --cwd functions firebase:build || true"
+    "predeploy": "yarn --ignore-engines --cwd functions firebase:build || true"
   },
   "hosting": {
-    "public": "dist",
+    "public": "dist/action-request",
     "ignore": [
       "firebase.json",
       "**/.*",

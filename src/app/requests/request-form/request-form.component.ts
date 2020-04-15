@@ -1,18 +1,21 @@
 import { Location } from '@angular/common';
 import {
-  ApplicationRef, ChangeDetectorRef, Component, EventEmitter, Input, Output, OnInit, NgZone, ViewChild, OnChanges, DoCheck
+  ApplicationRef,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnInit,
+  NgZone,
+  ViewChild,
+  DoCheck,
 } from '@angular/core';
 import { FormControl, NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import 'rxjs/add/observable/from';
-import 'rxjs/add/operator/combineLatest';
-import 'rxjs/add/operator/concat';
-import 'rxjs/add/operator/concatMap';
-import { Observable } from 'rxjs/Observable';
-import { interval } from 'rxjs/observable/interval';
-import { range } from 'rxjs/observable/range';
-import { delay, map, startWith, take } from 'rxjs/operators';
-import { FileSystemFileEntry, UploadEvent } from 'ngx-file-drop';
+import { Observable, interval } from 'rxjs';
+import { map, startWith, take } from 'rxjs/operators';
+import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop';
 
 import { environment } from '../../../environments/environment';
 import { Upload, UploadService } from '../../uploads';
@@ -21,7 +24,7 @@ import { ActionRequest, ActionRequestService } from '../shared';
 @Component({
   selector: 'app-request-form',
   templateUrl: './request-form.component.html',
-  styleUrls: ['./request-form.component.css']
+  styleUrls: ['./request-form.component.css'],
 })
 export class RequestFormComponent implements OnInit, DoCheck {
   clearInProgress = false;
@@ -70,7 +73,7 @@ export class RequestFormComponent implements OnInit, DoCheck {
     '.tiff',
     '.txt',
     '.xls',
-    '.xlsx'
+    '.xlsx',
   ];
 
   @Input() request: ActionRequest;
@@ -83,13 +86,16 @@ export class RequestFormComponent implements OnInit, DoCheck {
   @ViewChild('requestForm') requestForm: NgForm;
 
   categories = [
-    'admin', 'assembly', 'engineering', 'priority', 'purchasing', 'shipping', 'vendor', 'welding'
+    'admin',
+    'assembly',
+    'engineering',
+    'priority',
+    'purchasing',
+    'shipping',
+    'vendor',
+    'welding',
   ];
-  statuses = [
-    'new',
-    'approved',
-    'resolved'
-  ];
+  statuses = ['new', 'approved', 'resolved'];
 
   constructor(
     private actionRequestService: ActionRequestService,
@@ -99,55 +105,70 @@ export class RequestFormComponent implements OnInit, DoCheck {
     private location: Location,
     private ngZone: NgZone,
     private uploadService: UploadService
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.actionRequestService.getActionRequests(250).subscribe(actionRequests => {
-      this.actionRequestNumbers = Array.from(new Set(actionRequests
-        .map(actionRequest => actionRequest.humanReadableCode || null)
-        .filter(humanReadableCode => humanReadableCode)
-        .sort()
-        .reverse()
-      ));
+    this.actionRequestService
+      .getActionRequests(250)
+      .subscribe((actionRequests) => {
+        this.actionRequestNumbers = Array.from(
+          new Set(
+            actionRequests
+              .map((actionRequest) => actionRequest.humanReadableCode || null)
+              .filter((humanReadableCode) => humanReadableCode)
+              .sort()
+              .reverse()
+          )
+        );
 
-      this.assigneeOptions = Array.from(new Set(actionRequests
-        .map(actionRequest => actionRequest.assignee ? actionRequest.assignee.toLowerCase() : null)
-        .filter(assignee => assignee)
-        .sort()
-      ));
+        this.assigneeOptions = Array.from(
+          new Set(
+            actionRequests
+              .map((actionRequest) =>
+                actionRequest.assignee
+                  ? actionRequest.assignee.toLowerCase()
+                  : null
+              )
+              .filter((assignee) => assignee)
+              .sort()
+          )
+        );
 
-      this.reporterOptions = Array.from(new Set(actionRequests
-        .map(actionRequest => actionRequest.reporter || null)
-        .filter(reporter => reporter)
-        .sort()
-      ));
-    });
+        this.reporterOptions = Array.from(
+          new Set(
+            actionRequests
+              .map((actionRequest) => actionRequest.reporter || null)
+              .filter((reporter) => reporter)
+              .sort()
+          )
+        );
+      });
 
-    this.filteredAssignees = this.assigneeControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(val => this.filterAssignees(val))
-      );
+    this.filteredAssignees = this.assigneeControl.valueChanges.pipe(
+      startWith(''),
+      map((val) => this.filterAssignees(val))
+    );
 
-    this.filteredReporters = this.reporterControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(val => this.filterReporters(val))
-      );
+    this.filteredReporters = this.reporterControl.valueChanges.pipe(
+      startWith(''),
+      map((val) => this.filterReporters(val))
+    );
 
     this.reloadPageEvery30Minutes();
 
     // this.app.isStable.subscribe((isStable) => console.log('isStable', isStable));
 
-    this.debug = this.route
-      .queryParamMap
-      .pipe(
-        map(params => params.get('debug'))
-      );
+    this.debug = this.route.queryParamMap.pipe(
+      map((params) => params.get('debug'))
+    );
   }
 
   ngDoCheck(): void {
-    if (!this.clearInProgress && this.currentUpload && this.currentUpload.progress === 100) {
+    if (
+      !this.clearInProgress &&
+      this.currentUpload &&
+      this.currentUpload.progress === 100
+    ) {
       this.clearInProgress = true;
       setTimeout(() => {
         this.currentUpload = undefined;
@@ -157,27 +178,29 @@ export class RequestFormComponent implements OnInit, DoCheck {
   }
 
   filterAssignees(val: string): string[] {
-    return this.assigneeOptions.filter(option =>
-      option.toLowerCase().indexOf(val.toLowerCase()) === 0);
+    return this.assigneeOptions.filter(
+      (option) => option.toLowerCase().indexOf(val.toLowerCase()) === 0
+    );
   }
 
   filterReporters(val: string): string[] {
-    return this.reporterOptions.filter(option =>
-      option.toLowerCase().indexOf(val.toLowerCase()) === 0);
+    return this.reporterOptions.filter(
+      (option) => option.toLowerCase().indexOf(val.toLowerCase()) === 0
+    );
   }
 
   goBack(): void {
     this.location.back();
   }
 
-  droppedFiles(event: UploadEvent): void {
+  droppedFiles(files: NgxFileDropEntry[]): void {
     this.refreshFor90seconds();
 
     if (!this.currentUpload) {
       this.currentUpload = { progress: 0 } as Upload;
     }
 
-    for (const droppedFile of event.files) {
+    for (const droppedFile of files) {
       if (droppedFile.fileEntry.isFile) {
         const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
         fileEntry.file((file: File) => this.uploadFile(file));
@@ -279,11 +302,15 @@ export class RequestFormComponent implements OnInit, DoCheck {
       this.request.attachments.push({
         filename: upload.file.name,
         attachmentUrl: upload.url,
-        thumbUrl: upload.thumbUrl || upload.url
+        thumbUrl: upload.thumbUrl || upload.url,
       });
     }
 
-    if (!this.request.humanReadableCode && this.actionRequestNumbers && this.actionRequestNumbers.length) {
+    if (
+      !this.request.humanReadableCode &&
+      this.actionRequestNumbers &&
+      this.actionRequestNumbers.length
+    ) {
       this.request.humanReadableCode = this.actionRequestNumbers[0];
     }
 
@@ -297,6 +324,6 @@ export class RequestFormComponent implements OnInit, DoCheck {
     this.actionRequestService
       ._incrementCounter(300)
       .then(() => this.actionRequestService._incrementCounter())
-      .then(value => this.increment = value);
+      .then((value) => (this.increment = value));
   }
 }

@@ -4,12 +4,9 @@
     "outDir": "../out-tsc/app",
     "baseUrl": "./",
     "module": "es2015",
-    "types": [
-      "object-hash"
-    ]
+    "types": ["object-hash"]
   },
-  "exclude": [
-    "test.ts",
-    "**/*.spec.ts"
-  ]
+  "files": ["main.ts", "polyfills.ts"],
+  "include": ["**/*.d.ts"],
+  "exclude": ["test.ts", "**/*.spec.ts"]
 }

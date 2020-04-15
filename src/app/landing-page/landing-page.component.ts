@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 
 import { environment } from '../../environments/environment';
@@ -8,7 +8,7 @@ import { ActionRequest, ActionRequestService } from '../requests';
 @Component({
   selector: 'app-landing-page',
   templateUrl: './landing-page.component.html',
-  styleUrls: ['./landing-page.component.css']
+  styleUrls: ['./landing-page.component.css'],
 })
 export class LandingPageComponent implements OnInit {
   env = environment;
@@ -21,12 +21,11 @@ export class LandingPageComponent implements OnInit {
     this.request = new ActionRequest();
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   openSnackBar(message: string) {
     this.snackBar.open(message, 'Dismiss', {
-      duration: 4000
+      duration: 4000,
     });
   }
 
@@ -34,6 +33,9 @@ export class LandingPageComponent implements OnInit {
     this.actionRequestService
       .create(request)
       .then(() => this.openSnackBar('Success: Action Request submitted!'))
-      .catch(error => this.openSnackBar(error));
+      .catch((error) => {
+        console.log('save error ====> ', error);
+        this.openSnackBar(error);
+      });
   }
 }

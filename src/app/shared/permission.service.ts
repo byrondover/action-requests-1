@@ -1,17 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from 'rxjs/observable/of';
-import { catchError, concatMap, map } from 'rxjs/operators';
-
+import { Observable, of as observableOf } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { AuthService } from './auth.service';
 
 @Injectable()
 export class PermissionService {
-
-  constructor(
-    public authService: AuthService
-  ) { }
+  constructor(public authService: AuthService) {}
 
   private handleError(): Observable<boolean> {
     return observableOf(false);
@@ -22,7 +17,6 @@ export class PermissionService {
   }
 
   isAuthenticated(): Observable<boolean> {
-    return this.authService.user$.map(user => !!user);
+    return this.authService.user$.pipe(map((user) => !!user));
   }
-
 }

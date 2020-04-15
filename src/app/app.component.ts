@@ -1,19 +1,25 @@
 import { Component } from '@angular/core';
-import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material';
+import {
+  MatSnackBar,
+  MatSnackBarRef,
+  SimpleSnackBar,
+} from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import * as firebase from 'firebase/app';
 import { mapTo } from 'rxjs/operators';
-import { Observable } from 'rxjs/Observable';
-import { fromEvent as observableFromEvent } from 'rxjs/observable/fromEvent';
-import { merge as observableMerge } from 'rxjs/observable/merge';
-import { of as observableOf } from 'rxjs/observable/of';
+import {
+  Observable,
+  fromEvent as observableFromEvent,
+  merge as observableMerge,
+  of as observableOf,
+} from 'rxjs';
 
 import { AuthService, PermissionService } from './shared';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   title = 'Action Requests';
@@ -65,10 +71,13 @@ export class AppComponent {
   }
 
   private displayOfflineMessage = (): void => {
-    this.snackBarRef = this.snackBar.open('You appear to be offline. Please check your connection.', 'Reload');
-  }
+    this.snackBarRef = this.snackBar.open(
+      'You appear to be offline. Please check your connection.',
+      'Reload'
+    );
+  };
 
   private hideOfflineMessage = (): void => {
     this.snackBarRef.dismiss();
-  }
+  };
 }

@@ -1,11 +1,11 @@
 import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
-import { MatChipInputEvent } from '@angular/material';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-watchers-chip-list-input',
   templateUrl: './watchers-chip-list-input.component.html',
-  styleUrls: ['./watchers-chip-list-input.component.css']
+  styleUrls: ['./watchers-chip-list-input.component.css'],
 })
 export class WatchersChipListComponent implements OnInit {
   selectable = true;
@@ -18,10 +18,9 @@ export class WatchersChipListComponent implements OnInit {
   @Input() watchers: string[] = [];
   @Output() watchersUpdated = new EventEmitter();
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   add(event: MatChipInputEvent): void {
     const input = event.input;

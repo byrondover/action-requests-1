@@ -4,10 +4,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { AngularFireModule } from 'angularfire2';
-import { AngularFireAuthModule } from 'angularfire2/auth';
-import { AngularFirestoreModule } from 'angularfire2/firestore';
-import { FileDropModule } from 'ngx-file-drop';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { NgxFileDropModule } from 'ngx-file-drop';
 import 'hammerjs';
 
 import { environment } from '../environments/environment';
@@ -15,9 +15,20 @@ import { AppComponent } from './app.component';
 import { AppMaterialModule } from './app-material.module';
 import { AppRoutingModule } from './app-routing.module';
 import { LandingPageComponent } from './landing-page/landing-page.component';
-import { AssigneeAutocompleteComponent, ActionRequestService, CloseConfirmationComponent, RequestDataTableComponent,
-         RequestDetailComponent, RequestEditComponent, RequestFormComponent } from './requests';
-import { AngularFirestoreService, AuthService, PermissionService } from './shared';
+import {
+  AssigneeAutocompleteComponent,
+  ActionRequestService,
+  CloseConfirmationComponent,
+  RequestDataTableComponent,
+  RequestDetailComponent,
+  RequestEditComponent,
+  RequestFormComponent,
+} from './requests';
+import {
+  AngularFirestoreService,
+  AuthService,
+  PermissionService,
+} from './shared';
 import { UploadService } from './uploads';
 import { WatchersChipListComponent } from './requests/watchers-chip-list-input/watchers-chip-list-input.component';
 import { XlsxService } from './shared/xlsx.service';
@@ -32,7 +43,7 @@ import { XlsxService } from './shared/xlsx.service';
     RequestDetailComponent,
     RequestEditComponent,
     RequestFormComponent,
-    WatchersChipListComponent
+    WatchersChipListComponent,
   ],
   imports: [
     AngularFireAuthModule,
@@ -44,9 +55,11 @@ import { XlsxService } from './shared/xlsx.service';
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
-    FileDropModule,
-    AppMaterialModule
+    ServiceWorkerModule.register('/ngsw-worker.js', {
+      enabled: environment.production,
+    }),
+    NgxFileDropModule,
+    AppMaterialModule,
   ],
   providers: [
     ActionRequestService,
@@ -54,9 +67,9 @@ import { XlsxService } from './shared/xlsx.service';
     AuthService,
     PermissionService,
     UploadService,
-    XlsxService
+    XlsxService,
   ],
-  entryComponents: [ CloseConfirmationComponent ],
-  bootstrap: [ AppComponent ]
+  entryComponents: [CloseConfirmationComponent],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
