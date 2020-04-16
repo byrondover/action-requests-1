@@ -8,10 +8,10 @@ Create a [Firebase](http://firebase.google.com) account and a [Mailgun](https://
 
 Install the following.
 
-* [Node.js >= 6.11.5 < 8.0.0](https://nodejs.org)
-* [Yarn >= 1.3.2](https://yarnpkg.com)
-* [Angular CLI >= 1.6.2](https://cli.angular.io)
-* [Firebase CLI >= 3.16.0](https://firebase.google.com/docs/cli)
+- [Node.js >= 10](https://nodejs.org)
+- [Yarn >= 1.22.4](https://yarnpkg.com)
+- [Angular CLI >= 9.1.1](https://cli.angular.io)
+- [Firebase CLI >= 8.0.3](https://firebase.google.com/docs/cli)
 
 ```shell
 brew install node yarn
@@ -19,15 +19,18 @@ yarn global add @angular/cli
 yarn global add firebase-tools
 ```
 
-**Note**: Node 8 is not yet [supported by Firebase
-Functions](https://cloud.google.com/functions/docs/writing/#the_cloud_functions_runtime).
-
 ## Setup
 
 From the app's root directory, install the app's Node package dependencies.
 
 ```shell
 yarn install
+```
+
+From the functions directory, install the Node package dependencies for firebase functions.
+
+```
+yarn --ignore-engines install
 ```
 
 Initialize Firebase and populate your Firebase project configuration.
