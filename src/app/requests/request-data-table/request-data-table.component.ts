@@ -1,10 +1,17 @@
-import { AfterViewInit, Component, HostListener, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
+import {
+  AfterViewInit,
+  Component,
+  HostListener,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { flow, sortBy } from 'lodash/fp';
-import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { Subscription } from 'rxjs/Subscription';
 
 import { ActionRequest, ActionRequestService } from '../shared';
 import { XlsxService } from '../../shared/xlsx.service';
@@ -12,24 +19,20 @@ import { XlsxService } from '../../shared/xlsx.service';
 @Component({
   selector: 'app-request-data-table',
   templateUrl: './request-data-table.component.html',
-  styleUrls: ['./request-data-table.component.css']
+  styleUrls: ['./request-data-table.component.css'],
 })
 export class RequestDataTableComponent implements OnInit, AfterViewInit {
   activeSubscription: Subscription;
   checked = false;
   dataSource = new MatTableDataSource<ActionRequest>();
   displayedColumns: string[] = [];
-  tinyScreenColumns = [
-    'salesOrderNumber',
-    'reporter',
-    'status'
-  ];
+  tinyScreenColumns = ['salesOrderNumber', 'reporter', 'status'];
   smallScreenColumns = [
     'salesOrderNumber',
     'createdAt',
     'reporter',
     'assignee',
-    'status'
+    'status',
   ];
   largeScreenColumns = [
     'humanReadableCode',
@@ -40,7 +43,7 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
     'category',
     'attachments',
     'approvedActionPlan',
-    'status'
+    'status',
   ];
   loading = true;
   urgentColumn: string;
@@ -57,13 +60,16 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private router: Router,
     private xlsxService: XlsxService
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.route
-      .paramMap
-      .pipe(switchMap((params: ParamMap) => this.processShowAll(params.get('showAll') === 'true')))
-      .subscribe(actionRequests => {
+    this.route.paramMap
+      .pipe(
+        switchMap((params: ParamMap) =>
+          this.processShowAll(params.get('showAll') === 'true')
+        )
+      )
+      .subscribe((actionRequests: ActionRequest[]) => {
         this.dataSource.data = actionRequests;
         this.loading = false;
 
@@ -71,8 +77,7 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
         this.processFilters(this.params);
       });
 
-    this.route
-      .paramMap
+    this.route.paramMap
       .pipe(map((params: ParamMap) => this.paramsToFilters(params)))
       .subscribe((filters: any) => this.processFilters(filters));
 
@@ -84,13 +89,16 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
     this.dataSource.sortingDataAccessor = (item, property) => {
       switch (property) {
-        case 'createdAt': return item.createdAt.toMillis();
-        case 'createdAtVerbose': return item.createdAt.toMillis();
-        default: return item[property];
+        case 'createdAt':
+          return item.createdAt.toMillis();
+        case 'createdAtVerbose':
+          return item.createdAt.toMillis();
+        default:
+          return item[property];
       }
     };
 
-    this.sort.sortChange.subscribe(sort => this.persistSort(sort));
+    this.sort.sortChange.subscribe((sort) => this.persistSort(sort));
   }
 
   applyFilter(filterValue: string) {
@@ -113,24 +121,28 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
   }
 
   export(): void {
-    const spreadsheet = flow([sortBy('No.')])(this.dataSource.filteredData.map((actionRequest: ActionRequest) => {
-      return {
-        'No.': actionRequest.humanReadableCode,
-        'Sales Order': actionRequest.salesOrderNumber,
-        'Created': actionRequest.createdAt.toDate(),
-        'Updated': actionRequest.updatedAt.toDate(),
-        'Reporter': actionRequest.reporter,
-        'Assignee': actionRequest.assignee,
-        'Category': this.titlecase(actionRequest.category),
-        'ECN': actionRequest.ecn,
-        'Attachments': !!(actionRequest.attachments && actionRequest.attachments.length),
-        'Urgent': !!actionRequest.isUrgent,
-        'Status': this.titlecase(actionRequest.status),
-        'Discrepancy': actionRequest.discrepancy,
-        'Action Plan': actionRequest.approvedActionPlan,
-        'Resolution': actionRequest.resolution
-      };
-    }));
+    const spreadsheet = flow([sortBy('No.')])(
+      this.dataSource.filteredData.map((actionRequest: ActionRequest) => {
+        return {
+          'No.': actionRequest.humanReadableCode,
+          'Sales Order': actionRequest.salesOrderNumber,
+          Created: actionRequest.createdAt.toDate(),
+          Updated: actionRequest.updatedAt.toDate(),
+          Reporter: actionRequest.reporter,
+          Assignee: actionRequest.assignee,
+          Category: this.titlecase(actionRequest.category),
+          ECN: actionRequest.ecn,
+          Attachments: !!(
+            actionRequest.attachments && actionRequest.attachments.length
+          ),
+          Urgent: !!actionRequest.isUrgent,
+          Status: this.titlecase(actionRequest.status),
+          Discrepancy: actionRequest.discrepancy,
+          'Action Plan': actionRequest.approvedActionPlan,
+          Resolution: actionRequest.resolution,
+        };
+      })
+    );
 
     this.xlsxService.export(spreadsheet);
   }
@@ -143,22 +155,30 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
     if (this.checked) {
       this.loading = true;
       this.activeSubscription.unsubscribe();
-      this.activeSubscription = this.actionRequestService.getActionRequests().subscribe(actionRequests => {
-        this.dataSource.data = actionRequests;
-        this.loading = false;
-      });
+      this.activeSubscription = this.actionRequestService
+        .getActionRequests()
+        .subscribe((actionRequests) => {
+          this.dataSource.data = actionRequests;
+          this.loading = false;
+        });
     } else {
       this.activeSubscription.unsubscribe();
-      this.activeSubscription = this.actionRequestService.getOpenActionRequests().subscribe(actionRequests => {
-        this.dataSource.data = actionRequests;
-        this.loading = false;
-      });
+      this.activeSubscription = this.actionRequestService
+        .getOpenActionRequests()
+        .subscribe((actionRequests) => {
+          this.dataSource.data = actionRequests;
+          this.loading = false;
+        });
     }
   }
 
   titlecase(str) {
-    if (!str) { return ''; }
-    return str.replace(/\b\S/g, function(t) { return t.toUpperCase(); });
+    if (!str) {
+      return '';
+    }
+    return str.replace(/\b\S/g, function (t) {
+      return t.toUpperCase();
+    });
   }
 
   @HostListener('window:resize', ['$event'])
@@ -171,15 +191,24 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
   persistPage(page: any): void {
     delete page.length;
     const stringifiedPage = JSON.stringify(page);
-    this.router.navigate(['requests', this.sanitizeParams({ ...this.params, page: stringifiedPage })]);
+    this.router.navigate([
+      'requests',
+      this.sanitizeParams({ ...this.params, page: stringifiedPage }),
+    ]);
   }
 
   persistShowAll(checked): void {
-    this.router.navigate(['requests', this.sanitizeParams({ ...this.params, showAll: checked.checked })]);
+    this.router.navigate([
+      'requests',
+      this.sanitizeParams({ ...this.params, showAll: checked.checked }),
+    ]);
   }
 
   persistSearch(filterValue: string) {
-    this.router.navigate(['requests', this.sanitizeParams({ ...this.params, search: filterValue })]);
+    this.router.navigate([
+      'requests',
+      this.sanitizeParams({ ...this.params, search: filterValue }),
+    ]);
   }
 
   persistSort(sort: any): void {
@@ -188,7 +217,10 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
     // {active: "createdAt", direction: ""}
 
     const stringifiedSort = JSON.stringify(sort);
-    this.router.navigate(['requests', this.sanitizeParams({ ...this.params, sort: stringifiedSort })]);
+    this.router.navigate([
+      'requests',
+      this.sanitizeParams({ ...this.params, sort: stringifiedSort }),
+    ]);
   }
 
   processFilters(filters: any) {
@@ -218,8 +250,14 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
         this.paginator.pageSize = page.pageSize;
         this.processSearch(this.search);
       } else {
-        const stringifiedPage = JSON.stringify({ pageIndex: 0, pageSize: page.pageSize });
-        this.router.navigate(['requests', this.sanitizeParams({ ...this.params, page: stringifiedPage })]);
+        const stringifiedPage = JSON.stringify({
+          pageIndex: 0,
+          pageSize: page.pageSize,
+        });
+        this.router.navigate([
+          'requests',
+          this.sanitizeParams({ ...this.params, page: stringifiedPage }),
+        ]);
       }
     }
   }
@@ -246,12 +284,12 @@ export class RequestDataTableComponent implements OnInit, AfterViewInit {
   }
 
   paramsToFilters(params: ParamMap) {
-    this.params =  {
+    this.params = {
       itemsPerPage: params.get('itemsPerPage'),
       page: params.get('page'),
       search: params.get('search'),
       showAll: params.get('showAll'),
-      sort: params.get('sort')
+      sort: params.get('sort'),
     };
     return this.params;
   }

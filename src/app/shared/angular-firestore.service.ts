@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, QueryFn } from 'angularfire2/firestore';
+import { AngularFirestore, QueryFn } from '@angular/fire/firestore';
 import * as firebase from 'firebase';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { _throw as observableThrow } from 'rxjs/observable/throw';
-
+import { throwError as observableThrow } from 'rxjs';
 
 @Injectable()
 export class AngularFirestoreService {
@@ -14,7 +13,7 @@ export class AngularFirestoreService {
   constructor(private afs: AngularFirestore) {
     // TODO: remove once Firebase deprecates Timestamp -> Date conversion
     // https://github.com/angular/angularfire2/issues/1575
-    afs.firestore.settings({ timestampsInSnapshots: true });
+    // afs.firestore.settings({ timestampsInSnapshots: true });
     afs.firestore.enablePersistence();
   }
 
@@ -24,24 +23,23 @@ export class AngularFirestoreService {
     return this.afs
       .collection<T>(`${databasePath}`, query)
       .valueChanges()
-      .pipe(
-        catchError(this.handleAngularFirestoreListObservableError)
-      );
+      .pipe(catchError(this.handleAngularFirestoreListObservableError));
   }
 
   doc<T>(databasePath: string): Observable<T> {
     return this.afs
       .doc<T>(`${databasePath}`)
       .valueChanges()
-      .pipe(
-        catchError(this.handleAngularFirestoreObjectObservableError)
-      );
+      .pipe(catchError(this.handleAngularFirestoreObjectObservableError));
   }
 
   add<T>(databasePath: string, data: {}): Promise<T> {
     const pushKey = this.afs.createId();
     const sanitizedData = this.sanitizeProperties({
-      key: pushKey, ...data, createdAt: this.timestamp, updatedAt: this.timestamp
+      key: pushKey,
+      ...data,
+      createdAt: this.timestamp,
+      updatedAt: this.timestamp,
     });
 
     return this.afs
@@ -52,7 +50,10 @@ export class AngularFirestoreService {
   }
 
   set(databasePath: string, data: {}): Promise<void> {
-    const sanitizedData = this.sanitizeProperties({ ...data, updatedAt: this.timestamp });
+    const sanitizedData = this.sanitizeProperties({
+      ...data,
+      updatedAt: this.timestamp,
+    });
 
     return this.afs
       .doc(`${databasePath}`)
@@ -61,7 +62,10 @@ export class AngularFirestoreService {
   }
 
   update(databasePath: string, data: {}): Promise<void> {
-    const sanitizedData = this.sanitizeProperties({ ...data, updatedAt: this.timestamp });
+    const sanitizedData = this.sanitizeProperties({
+      ...data,
+      updatedAt: this.timestamp,
+    });
 
     return this.afs
       .doc(`${databasePath}`)
@@ -77,9 +81,8 @@ export class AngularFirestoreService {
   }
 
   private handleAngularFirestoreListObservableError(error: any) {
-    const errorDetails: string = (error && error.message)
-      ? error.message
-      : error && error.toString();
+    const errorDetails: string =
+      error && error.message ? error.message : error && error.toString();
     const errorMessage = `Error occurred fetching list observable from Firebase: ${errorDetails}`;
 
     console.error(errorMessage);
@@ -87,9 +90,8 @@ export class AngularFirestoreService {
   }
 
   private handleAngularFirestoreObjectObservableError(error: any) {
-    const errorDetails: string = (error && error.message)
-      ? error.message
-      : error && error.toString();
+    const errorDetails: string =
+      error && error.message ? error.message : error && error.toString();
     const errorMessage = `Error occurred fetching object observable from Firebase: ${errorDetails}`;
 
     console.error(errorMessage);
@@ -100,9 +102,8 @@ export class AngularFirestoreService {
    * TODO: Add remote logging to centrally capture and monitor errors.
    */
   private handleFirebasePromiseError(error: any): Promise<any> {
-    const errorDetails: string = (error && error.message)
-      ? error.message
-      : error && error.toString();
+    const errorDetails: string =
+      error && error.message ? error.message : error && error.toString();
     const errorMessage = `Error occured writing to Firebase: ${errorDetails}`;
 
     console.error(errorMessage);
@@ -128,5 +129,4 @@ export class AngularFirestoreService {
     }
     return data;
   }
-
 }

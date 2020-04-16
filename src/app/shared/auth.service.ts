@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireAuth } from '@angular/fire/auth';
 import * as firebase from 'firebase';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -10,15 +10,14 @@ export class AuthService {
 
   constructor(public auth: AngularFireAuth) {
     this.user$ = auth.authState;
-    this.user$.subscribe((user: firebase.User) => this.currentUser = user);
+    this.user$.subscribe((user: firebase.User) => (this.currentUser = user));
   }
 
   login() {
-    this.auth.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+    this.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
   }
 
   logout() {
-    this.auth.auth.signOut();
+    this.auth.signOut();
   }
-
 }

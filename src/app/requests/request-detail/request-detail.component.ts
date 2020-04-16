@@ -1,17 +1,18 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
-import { Upload, UploadService } from '../../uploads';
+import { UploadService } from '../../uploads';
 import { ActionRequest, ActionRequestService } from '../shared';
 import { CloseConfirmationComponent } from '../close-confirmation/close-confirmation.component';
 
 @Component({
   selector: 'app-request-detail',
   templateUrl: './request-detail.component.html',
-  styleUrls: ['./request-detail.component.css']
+  styleUrls: ['./request-detail.component.css'],
 })
 export class RequestDetailComponent implements OnInit {
   loading = true;
@@ -27,9 +28,9 @@ export class RequestDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private snackBar: MatSnackBar,
-    private actionRequestService: ActionRequestService,
+    public actionRequestService: ActionRequestService,
     private uploadService: UploadService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.getActionRequest();
@@ -38,10 +39,10 @@ export class RequestDetailComponent implements OnInit {
   closePrompt(): void {
     const dialogRef = this.dialog.open(CloseConfirmationComponent, {
       width: '500px',
-      data: { resolution: null }
+      data: { resolution: null },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.request.resolution = result;
         this.request.status = 'resolved';
@@ -55,7 +56,9 @@ export class RequestDetailComponent implements OnInit {
       this.requestKey = params['key'];
 
       if (this.requestKey) {
-        this.request$ = this.actionRequestService.getActionRequest(this.requestKey);
+        this.request$ = this.actionRequestService.getActionRequest(
+          this.requestKey
+        );
         this.request$.subscribe((request: ActionRequest) => {
           this.loading = false;
           this.request = request;
@@ -74,7 +77,7 @@ export class RequestDetailComponent implements OnInit {
 
   openSnackBar(message: string) {
     this.snackBar.open(message, 'Dismiss', {
-      duration: 4000
+      duration: 4000,
     });
   }
 
@@ -82,29 +85,35 @@ export class RequestDetailComponent implements OnInit {
     const santizedAssignee = assignee.trim().toLowerCase();
 
     if (this.request.assignee !== santizedAssignee) {
-      if (this.request.watchers && !this.request.watchers.includes(this.request.assignee)) {
+      if (
+        this.request.watchers &&
+        !this.request.watchers.includes(this.request.assignee)
+      ) {
         this.request.watchers.push(this.request.assignee);
       }
 
       this.request.assignee = santizedAssignee;
-      this.save().then(() => this.openSnackBar('Success: Action Request reassigned!'));
+      this.save().then(() =>
+        this.openSnackBar('Success: Action Request reassigned!')
+      );
     }
     this.assigneeEditable = false;
   }
 
   resolve(): void {
-    this.save().then(() => this.openSnackBar('Success: Action Request resolved!'));
+    this.save().then(() =>
+      this.openSnackBar('Success: Action Request resolved!')
+    );
     // .then(() => this.goBack())
   }
 
   save(): Promise<void> {
     return this.actionRequestService
       .update(this.request)
-      .catch(error => this.openSnackBar(error));
+      .catch((error) => this.openSnackBar(error));
   }
 
   update(): void {
     this.router.navigate(['requests', this.requestKey, 'edit']);
   }
-
 }
